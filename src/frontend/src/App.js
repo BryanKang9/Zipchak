@@ -1,11 +1,10 @@
 import logo from './logo.svg';
 import './App.css';
-import MemberList from "./member/MemberList";
 
 function App() {
   return (
-     <MemberList/>
-  )
+  <div></div>
+      )
 }
 
 export default App;

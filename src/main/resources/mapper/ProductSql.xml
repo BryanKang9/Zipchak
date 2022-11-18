@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="data.mapper.ProductMapper">
+    <insert id="insertProduct" parameterType="ProductDto">-- 상품추가
+    INSERT INTO pd (pd_name,pd_price,pd_ctg,pd_status)
+    VALUES (#{pd_name},#{pd_price},#{pd_ctg},'onsale')
+        <selectKey keyProperty="pd_num" resultType="int" order="AFTER">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+    </insert>
+    <insert id="insertProductImg" parameterType="ProductImageDto">-- 상품이미지추가
+    INSERT INTO pd_img (pd_num,img_name)
+    VALUES (#{pd_num},#{img_name})
+    </insert>
+    <select id="getImages" parameterType="int" resultType="String">
+        SELECT img_name from pd_img where pd_num=#{pd_num}
+    </select>
+    <delete id="deleteShop" parameterType="int">-- 상품+판매글삭제
+    DELETE FROM pd WHERE pd_num=#{pd_num}
+    </delete>
+    <update id="updateSoldOut" parameterType="int">-- 상태:판매완료
+        UPDATE pd set pd_status="soldout" WHERE pd_num=#{pd_num}
+    </update>
+</mapper>

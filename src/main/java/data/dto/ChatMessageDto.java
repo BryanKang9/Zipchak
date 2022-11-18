@@ -7,12 +7,15 @@ import org.apache.ibatis.type.Alias;
 import java.sql.Timestamp;
 
 @Data
-@Alias("MemberDto")
-public class MemberDto {
-    private int num;
-    private String myname;
-    private String myid;
-    private String mypass;
+@Alias("cmdto")
+public class ChatMessageDto {
+
+    private int cm_num;
+    private int cr_num;
+    private int sender;
+    private String msg;
+    private int is_read;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm",timezone = "Asia/Seoul")
-    private Timestamp gaipday;
+    private Timestamp cm_wdate;
+
 }
