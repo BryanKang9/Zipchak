@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="data.mapper.MyPageMapper">
+    <select id="getTmp" parameterType="int" resultType="double">
+        SELECT prf_tmp FROM BitFinalTeam2.ur_prf where ur_num=#{ur_num}
+    </select>
+    <update id="updateTmp" parameterType="map">
+        update ur_prf set prf_tmp=#{avgtmp} where ur_num=#{ur_num}
+    </update>
+    <insert id="insertRv" parameterType="rvdto">
+        insert into rv values (null,#{sp_num},#{touser},#{rv_tmp},#{rv_txt},now(),#{fromseller})
+    </insert>
+    <select id="checkRv" parameterType="int" resultType="int">
+        select count(*) from
+            (select sp.sp_title, pd_img.img_name, rv.touser, sp.pd_num,
+                    sp.ur_num, sp.sp_num, min(fromseller) fromseller from rv
+                        join sp on sp.sp_num=rv.sp_num                                                                                                            join pd_img on pd_img.pd_num=sp.pd_num
+             where touser=#{ur_num} or
+                     touser= ANY (select sp.ur_num from sp
+                         join rv on rv.sp_num= sp.sp_num
+                                  where touser=#{ur_num} group by sp.ur_num)
+             group by sp_num) as rvlist
+        where rvlist.touser=#{ur_num} and rvlist.ur_num!=#{ur_num} and fromseller=1
+    </select>
+    <select id="buylistforreview" parameterType="int" resultType="rvdto">
+        select * from
+            (select sp.sp_title, pd_img.img_name, rv.touser, sp.pd_num,
+                    sp.ur_num, sp.sp_num, min(fromseller) fromseller from rv
+                        join sp on sp.sp_num=rv.sp_num                                                                                                            join pd_img on pd_img.pd_num=sp.pd_num
+             where touser=#{ur_num} or
+                     touser= ANY (select sp.ur_num from sp
+                         join rv on rv.sp_num= sp.sp_num
+                                  where touser=#{ur_num} group by sp.ur_num)
+             group by sp_num) as rvlist
+        where rvlist.touser=#{ur_num} and rvlist.ur_num !=#{ur_num} order by fromseller desc
+    </select>
+    <select id="getRvList" parameterType="int" resultType="rvdto">
+        select sp.sp_num, sp.sp_title, pd_img.img_name, rv.rv_num, rv.touser, rv.rv_txt,rv.rv_tmp, sp.pd_num
+        from cr
+            join sp on sp.sp_num=cr.sp_num
+            join pd_img on pd_img.pd_num=sp.pd_num
+            join rv on rv.sp_num=sp.sp_num
+        where touser=#{ur_num}
+        group by rv_num
+        order by rv_wdate desc
+    </select>
+    <select id="getSellList" parameterType="int" resultType="map">
+        SELECT sp.sp_num, sp.pd_num, sp.sp_title, pd_img.img_name, pd_status FROM sp
+            join pd_img on pd_img.pd_num=sp.pd_num
+            join pd on pd.pd_num=sp.pd_num
+        where ur_num=#{ur_num} group by sp.sp_num
+    </select>
+    <select id="getFeedList" parameterType="int" resultType="map">
+        select ur_num,fd_num, fd_title,fd_img from fd where ur_num=#{ur_num}
+    </select>
+    <select id="getBookmarkList" parameterType="int" resultType="map">
+        select sp_like.sp_num, sp.sp_title, sp.pd_num, pd_img.img_name, pd.pd_status
+        from sp_like
+            join sp on sp.sp_num=sp_like.sp_num
+            join pd_img on pd_img.pd_num=sp.pd_num
+            join pd on pd.pd_num=sp.pd_num
+        where sp_like.ur_num=#{ur_num} group by sp_num
+    </select>
+    <select id="getLikeList" parameterType="int" resultType="map">
+        select fd_like.fd_num, fd.fd_title,fd.fd_img
+        from fd_like
+            join fd on fd.fd_num=fd_like.fd_num
+        where fd_like.ur_num=#{ur_num}
+    </select>
+    <update id="updateprf" parameterType="map">
+        update ur_prf set prf_nick=#{prf_nick}
+        <if test="prf_img!=null">
+            , prf_img=#{prf_img}
+        </if>
+        where ur_num=#{ur_num}
+    </update>
+    <select id="getpersonaldata" parameterType="int" resultType="UserDto">
+        select * from ur_info where ur_num=#{ur_num}
+    </select>
+    <update id="updateinfo" parameterType="UserDto">
+        update ur_prf,ur_info set ur_prf.prf_nick=#{prf_nick},
+            ur_info.info_addr=#{info_addr}, ur_info.info_hp=#{info_hp}, ur_info.info_email=#{info_email}
+        <if test="prf_img!=null">
+            , ur_prf.prf_img=#{prf_img}
+        </if>
+        where ur_prf.ur_num=#{ur_num} and ur_info.ur_num=#{ur_num}
+    </update>
+    <select id="sellerking" resultType="int">
+        select sp.ur_num from sp
+        group by ur_num
+        having count(*)=(select max(cnt) from (select ur_num, count(*) cnt from sp group by ur_num ) as mx)
+    </select>
+    <select id="buyerking" resultType="int">
+        select rv.touser from rv
+        where fromseller=1
+        group by touser
+        having count(*)=
+               (select max(cnt) from (select touser, count(*) cnt from rv where fromseller=1 group by touser) as mx)
+    </select>
+    <select id="tempking" resultType="int">
+        select ur_num from ur_prf as tb1
+        where tb1.prf_tmp=(select max(tb2.prf_tmp) from ur_prf as tb2)
+    </select>
+    <select id="bookmarkking" resultType="int">
+        select sp_like.ur_num from sp_like
+        group by ur_num
+        having count(*)=
+               (select max(cnt) from (select ur_num, count(*) cnt from sp_like group by ur_num ) as mx)
+    </select>
+    <select id="likeking" resultType="int">
+        select fd_like.ur_num from fd_like
+        group by ur_num
+        having count(*)=
+               (select max(cnt) from (select ur_num, count(*) cnt from fd_like group by ur_num ) as mx)
+    </select>
+    <select id="getSearchFeeds" parameterType="String" resultType="FeedListDto">
+        SELECT a.fd_num, a.fd_title, c.prf_nick, c.prf_img, a.fd_img, a.fd_wdate,a.fd_rdcnt, a.fd_style, b.likes fd_likes
+        from fd a
+                 left outer join ur_prf c
+                                 on a.ur_num=c.ur_num
+                 left outer join (select count(*) likes , fd_num from fd_like group by fd_num) b
+                                 on a.fd_num=b.fd_num
+        where fd_title like concat('%',#{search_word},'%')
+        union
+        SELECT a.fd_num, a.fd_title, c.prf_nick, c.prf_img, a.fd_img, a.fd_wdate,a.fd_rdcnt, a.fd_style, b.likes fd_likes
+        from fd a
+                 left outer join ur_prf c
+                                 on a.ur_num=c.ur_num
+                 left outer join (select count(*) likes , fd_num from fd_like group by fd_num) b
+                                 on a.fd_num=b.fd_num
+        where fd_txt like concat('%',#{search_word},'%')
+        union
+        SELECT a.fd_num, a.fd_title, c.prf_nick, c.prf_img, a.fd_img, a.fd_wdate,a.fd_rdcnt, a.fd_style, b.likes fd_likes
+        from fd a
+                 left outer join ur_prf c
+                                 on a.ur_num=c.ur_num
+                 left outer join (select count(*) likes , fd_num from fd_like group by fd_num) b
+                                 on a.fd_num=b.fd_num
+        where prf_nick like concat('%',#{search_word},'%')
+    </select>
+    <select id="getSearchShops" parameterType="String" resultType="ShopProductDto">
+        select sp.sp_num, sp.pd_num, sp.sp_title, prf_nick, prf_img, img_name img_first,
+               pd_price, pd_status
+        from sp
+            join ur_prf on ur_prf.ur_num=sp.ur_num
+            join pd_img on pd_img.pd_num=sp.pd_num
+            join pd on pd.pd_num=sp.pd_num
+        where sp_title like concat('%',#{search_word} ,'%')
+        group by sp.sp_num
+        union
+        select sp.sp_num, sp.pd_num, sp.sp_title, prf_nick, prf_img, img_name img_first,
+               pd_price, pd_status
+        from sp
+            join ur_prf on ur_prf.ur_num=sp.ur_num
+            join pd_img on pd_img.pd_num=sp.pd_num
+            join pd on pd.pd_num=sp.pd_num
+        where sp_txt like concat('%',#{search_word} ,'%')
+        group by sp.sp_num
+        union
+        select sp.sp_num, sp.pd_num, sp.sp_title, prf_nick, prf_img, img_name img_first,
+               pd_price, pd_status
+        from sp
+            join ur_prf on ur_prf.ur_num=sp.ur_num
+            join pd_img on pd_img.pd_num=sp.pd_num
+            join pd on pd.pd_num=sp.pd_num
+        where prf_nick like concat('%',#{search_word} ,'%')
+        group by sp.sp_num
+        order by pd_status
+    </select>
+</mapper>

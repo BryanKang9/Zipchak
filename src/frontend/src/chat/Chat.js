@@ -1,58 +1,94 @@
 import React, {useEffect, useState} from 'react';
 import '../css/Chat.css';
 import ChatRoomList from "./ChatRoomList";
-import {useParams} from "react-router-dom";
-import ChatMessage from "./ChatMessage";
 import ChatMessageList from "./ChatMessageList";
+import {useParams} from "react-router-dom";
 import axios from "axios";
+import MessageNotification from "./MessageNotification";
 
 function Chat(props) {
-    const [cr_num,setCr_num]=useState(0);
-    const [chatList, setChatList] = useState([]);
-    const ur_num=sessionStorage.ur_num;
-    const cr_click=(cr_num)=>{
-        setCr_num(cr_num);
-    }
-    //중고 페이지 생성 시 위치 이동 필요
-    let sp_num=1;
-    const createRoom=()=>{
-        let createRoomURL=localStorage.url+"/chat/create?buyer_num="+ur_num+"&sp_num="+sp_num;
-        axios.get(createRoomURL).then(res=>{
-            alert(res.data);
-            window.location.replace("/chat");
-        }
-        )
-    }
-    /////////////////////////////////////////////////////////////////////////////////
-
+    //변수
+    const {roomno}=useParams();
+    const [u_num,setU_num]=useState(0);
+    const [resize, setResize] = useState();
+    const [screenState,setScreenState]=useState(0); //0이면 둘다 보임, 1이면 room만, 2면 챗만
+    const ur_num=Number(sessionStorage.ur_num);
+    const [noti,setNoti]=useState();
+    const [cr_num,setCr_num]=useState(Number(roomno));
     //console.log(cr_num);
-    return (
-        <div className={'main-box'}>
-            <div className={'chatroom-list'}>
-                <div>
-                    <button onClick={()=>{
-                        createRoom();
-                        }} >채팅 만들기</button><br/>
-                    {/*
-                    <button onClick={()=>{
-                        sessionStorage.ur_num=1}} >session1</button>
-                    <button onClick={()=>{
-                        sessionStorage.ur_num=2}} >session2</button>
-                    <button onClick={()=>{
-                        sessionStorage.ur_num=3}} >session3</button>
-                        */}
-                </div>
-                <ChatRoomList ur_num={ur_num} cr_click={cr_click} /></div>
-            <div id={'chat-message'}>
-                {
-                    cr_num==0
-                        ?
-                        <b>채팅할 상대를 선택해주세요</b>
-                        :
-                        <ChatMessageList cr_num={cr_num} ur_num={ur_num} chatList={chatList} />
-                }
+    //함수
+    const cr_click=(cr_num,u_num)=>{
+        setCr_num(cr_num);
+        setU_num(u_num);
+    }
+    const screenStatef=(state)=>{
+        setScreenState(state);
+    }
+    const handleResize = () => {
+        setResize(window.innerWidth);
+    };
+    //연결,메시지 알림
+    const sendnoti=(input)=>{
+        setNoti(input);
+        //console.log(noti);
+    }
+    const reactsize=()=>{
+        if(resize>768){
+            setScreenState(0);
+        }
+        else if(resize<=768) {
+            if(cr_num===0){
+                setScreenState(1);
+            }else {
+                setScreenState(2);
+            }
+        }
+        //console.log(screenState);
+    }
 
+    //useEffect
+    useEffect(() => {
+        window.addEventListener("resize", handleResize);
+        return () => {
+            window.removeEventListener("resize", handleResize);
+        };
+    }, []);
+    useEffect(()=>{
+        setResize(window.innerWidth);
+        reactsize();
+    },[])
+    useEffect(()=>{
+        reactsize();
+    },[resize])
+    useEffect(()=>{
+        if (roomno!=0){
+            let readUrl=localStorage.url+"/chat/read?cr_num="+roomno+"&ur_num="+ur_num;
+            axios.get(readUrl).then(res=>sendnoti('연결:'+roomno+'번 방' ));
+            //console.log("url로 읽음처리")
+        }
+        },[roomno]
+    )
+    return (
+        <div className={'main-box'} style={{width:`${resize<=768?'600px':'95%'}`,
+            maxWidth:'1136px',
+            gridTemplateColumns:`${screenState===0?"30% 70%":screenState===1?"100% 0%":"0% 100%"}`}}
+            >
+            <div className={"chatroom-list"}
+            style={{display:`${screenState===0?"block":screenState===1?"block":resize<=768?"none":"block"}`}}>
+                <ChatRoomList ur_num={ur_num} cr_click={cr_click} sendnoti={sendnoti} roomno={roomno}
+                              cr_num={cr_num} noti={noti} screenStatef={screenStatef} screenState={screenState} /></div>
+            <div id={"chat_message"} style={{width:`${resize<=768?"590px":"100%"}`,
+                display:`${screenState===0?"block":screenState===1?"none":"block"}`}}>
+                {
+                    roomno==0
+                        ?
+                        <h1 className={'sellect_user'}>채팅할 상대를 선택해주세요</h1>
+                        :
+                        <ChatMessageList cr_num={cr_num} ur_num={ur_num} u_num={u_num} roomno={roomno}
+                             sendnoti={sendnoti} noti={noti} screenStatef={screenStatef} screenState={screenState}/>
+                }
             </div>
+            <MessageNotification noti={noti}/>
         </div>
     );
 }

@@ -1,0 +1,62 @@
+div.msg_list_box_top{
+    display: flex;
+    align-items: center;
+    box-shadow : 0 4px 4px -4px gray;
+}
+span.to_chat_room{
+    font-size: 30px;
+    color: #35C5F0;
+}
+div.uInfoBox{
+    display: flex;
+    width: 100%;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+}
+div.prf_box{
+    width: 55px;
+    height: 55px;
+    border-radius: 100px;
+    border: 1px solid #35C5F0;
+    background: 50% 50% no-repeat;
+    background-size: cover;
+}
+div.prf_nick{
+    font-size: 18px;
+}
+
+div.uinfobox_vline{
+    border-left : 3px solid #35C5F0;
+    height : 50px;
+    position:relative;
+    left: -50px;
+}
+div.spinfo_title{
+    position:relative;
+    left: -40px;
+    height: 30px;
+    /*max-width: 200px;*/
+    /*overflow: hidden;*/
+    /*white-space: nowrap;*/
+}
+.cr_exit{
+    float:right;
+    width:70px;
+    height:50px;
+    line-height:50px;
+    cursor: pointer;
+    color: #35c5f0;
+    font-weight: bold;
+}
+div.spinfo_img{
+    position:relative;
+    left: -40px;
+    width: 50px;
+    height: 50px;
+    border: 1px solid #35C5F0;
+    border-radius: 10px;
+    background: 50% 50% no-repeat;
+    background-size: cover;
+    cursor: pointer;
+}
