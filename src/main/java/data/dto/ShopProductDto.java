@@ -19,14 +19,16 @@ public class ShopProductDto {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm", timezone="Asia/Seoul")
     private Timestamp sp_wdate;
     private int sp_rdcnt;
-    private String pd_name;
     private int pd_price;
     private String pd_ctg;
     private String pd_status;
     private String img_first;
     List<String> images;
+    List<String> newimages;
     private String ur_id;
     private String prf_nick;
     private String prf_img;
     private double prf_tmp;
+    private int totallikes;
+    private int userlike;
 }

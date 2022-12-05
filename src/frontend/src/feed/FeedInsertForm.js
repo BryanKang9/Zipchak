@@ -1,4 +1,4 @@
-import React, {createElement, useEffect, useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import "../css/FeedForm.css";
 
 import {Editor, Viewer} from "@toast-ui/react-editor";
@@ -9,8 +9,7 @@ import colorSyntax from '@toast-ui/editor-plugin-color-syntax';
 import axios from "axios";
 
 import {useNavigate} from "react-router-dom";
-import {getWidth} from "react-slick/lib/utils/innerSliderUtils";
-
+import FeedTagPopover from "./FeedTagPopover";
 
 function FeedInsertForm(props) {
 
@@ -18,15 +17,17 @@ function FeedInsertForm(props) {
     const [pre_img, setPre_img] = useState('');
     const [file, setFile] = useState('');
 
+    const [sp_num, setSp_num] = useState('')
+
     //현재로그인한 user 정보
     const ur_num = sessionStorage.ur_num;
 
-    console.log("ur_num:"+ur_num);
+    console.log("ur_num:" + ur_num);
 
     const navi = useNavigate();
 
     //정규식 표현 - 평수 넣을 때 숫자아닌 것 들어가면 메세지 출력
-    const regex = /[0-9]/
+    const regex = /^[0-9]+$/
 
     const [dto, setDto] = useState({
         fd_title: '',
@@ -35,7 +36,7 @@ function FeedInsertForm(props) {
         fd_fml: '',
         fd_style: '',
         fd_txt: '',
-        ur_num:ur_num
+        ur_num: ur_num
     })
 
     const [errors, setErrors] = useState({
@@ -45,7 +46,6 @@ function FeedInsertForm(props) {
         fd_fml: '',
         fd_style: ''
     })
-
 
     //onClick 시 touched=true로 변경
     const [touched, setTouched] = useState({
@@ -69,7 +69,7 @@ function FeedInsertForm(props) {
     }
 
     //onClick 시 touched=true로 변경
-    const onClickData=(e)=>{
+    const onClickData = (e) => {
         setTouched({
             ...touched,
             [e.target.name]: true,
@@ -77,19 +77,17 @@ function FeedInsertForm(props) {
         validate(e);
     }
 
-    const validate=(e)=>{
+    const validate = (e) => {
 
-        if(!e.target.value)
-        {
+        if (!e.target.value) {
             setErrors({
                 ...errors,
-                [e.target.name]:"empty error",
+                [e.target.name]: "empty error",
             });
-        }
-        else{
+        } else {
             setErrors({
                 ...errors,
-                [e.target.name]:"",
+                [e.target.name]: "",
             });
         }
 
@@ -116,21 +114,21 @@ function FeedInsertForm(props) {
     const onSubmitEvent = (e) => {
         e.preventDefault();
 
-        if(!ur_num) {
+        if (!ur_num) {
             alert("로그인 해주세요");
             return;
         }
-        if(!file) {
+        if (!file) {
             alert("커버사진을 추가해 주세요");
             return;
         }
 
-        const formData = new FormData();
-        formData.append("file", file);
-        formData.append("dto",new Blob([JSON.stringify(dto)], {
-            type: "application/json"
-        }));
-        
+        let fdtxt = document.getElementsByClassName("toastui-editor-contents").item(0).firstElementChild
+        let fdbtn = fdtxt.getElementsByTagName("button").length
+        for (let i = 0; i < fdbtn; i++) {
+            fdtxt.getElementsByTagName("button").item(i).remove()
+        }
+
         // 위의 Blob 사용안하면 각각 넣어줘야함->controller에서 @ModelAttribute Dto로 받으면 되긴함
         // formData.append("fd_title",dto.fd_title);
         // formData.append("fd_spc",dto.fd_spc);
@@ -144,6 +142,12 @@ function FeedInsertForm(props) {
         // formData.append("dto",dto);
 
         // insert 메서드로 보내기
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("fd_txt", fdtxt.innerHTML);
+        formData.append("dto", new Blob([JSON.stringify(dto)], {
+            type: "application/json"
+        }));
         let insertUrl = localStorage.url + "/feed/insert";
         axios({
             method: 'post',
@@ -155,17 +159,122 @@ function FeedInsertForm(props) {
         });
     }
 
-    const editorRef=useRef();
+    const editorRef = useRef();
 
-    const [data,setData]=useState('')
+    const [submit, setSubmit] = useState(false)
 
-    const onChange=()=>{
+    const [anchorEl, setAnchorEl] = React.useState(null);
+
+    const [tagtarget, setTagtarget] = useState()
+
+    const [detail,setDetail] = useState(true)
+
+    const tagpdnum = (x) => {
+        document.getElementsByClassName(tagtarget).item(0).setAttribute("id", x)
+        setDetail(false)
+    }
+
+    const popoveropen = (x) => {
+        setAnchorEl(x);
+        setSp_num(x.getAttribute("id"))
+        setTagtarget(x.getAttribute("class"))
+    };
+
+    const popoveropen2 = (e) => {
+        setAnchorEl(e.currentTarget);
+        setSp_num(e.currentTarget.getAttribute("id"))
+        setTagtarget(e.currentTarget.getAttribute("class"))
+    };
+
+    const popoverclose = (e) => {
+        setAnchorEl(null);
+        setSp_num('')
+        deletetag()
+    }
+
+    const deletetag = () => {
+        let tag = document.getElementsByClassName(tagtarget).item(0)
+        if (tag!=null && tag.getAttribute("id") === "0") {
+            tag.remove()
+        }
+    }
+
+    const onChange = () => {
+
         setDto({
             ...dto,
-            ["fd_txt"]: editorRef.current?.getInstance().getHTML(),
+            ["fd_txt"]: editorRef.current?.getInstance().getHTML()
         })
     }
 
+    const addtag = () => {
+        setSubmit(true)
+    }
+
+    useEffect(() => {
+        addTagBtn();
+    }, [submit])
+
+    const addTagBtn = () => {
+
+        let imgtag = null
+        try {
+            imgtag = document.getElementsByClassName("toastui-editor-contents").item(0).getElementsByTagName('img')
+            const imgNum = imgtag.length
+            for (let i = 0; i < imgNum; i++) {
+                const divtag = document.createElement("div")
+                divtag.innerHTML = imgtag.item(i).outerHTML
+                divtag.setAttribute("style", "position:relative")
+                divtag.setAttribute("class","img_tag")
+                divtag.insertAdjacentHTML("beforeend",
+                    "<button class='btn editbtn' id='editbtn' style='background-color: rgba(0,0,0,0.7); opacity:1; position: absolute; color: white; right: 10px; bottom: 20px'>태그 편집</button>")
+                divtag.getElementsByTagName("button").item(0).addEventListener("click", changebtn)
+                divtag.getElementsByTagName("img").item(0).addEventListener("click", edittag)
+                imgtag.item(i).replaceWith(divtag)
+            }
+        } catch (e) {
+        }
+    }
+
+    const changebtn = (e) => {
+
+        if (e.target.innerText === "편집 완료") {
+            e.target.innerText = "태그 편집"
+            setDetail(true)
+        } else {
+            e.target.innerText = "편집 완료"
+            setDetail(false)
+        }
+
+        setDto({
+            ...dto,
+            ["fd_txt"]: document.getElementsByClassName("toastui-editor-contents").item(0).firstElementChild.innerHTML
+        })
+    }
+
+    var i = 1
+
+    const edittag = (e) => {
+
+        let img = e.target
+        let tagstate = e.target.nextSibling.innerText
+
+        if (tagstate === '편집 완료') {
+
+            let btndiv = document.createElement("div")
+            btndiv.insertAdjacentHTML("afterbegin",
+                "<svg width=\"32\" height=\"32\" viewBox=\"0 0 32 32\">" +
+                "<circle cx=\"16\" cy=\"16\" r=\"16\" fill=\"rgba(53,197,240,.8)\"></circle>" +
+                "<path stroke=\"#FFF\" stroke-linecap=\"square\" stroke-width=\"2\" d=\"M16 24V8m-8 8h16\"></path></svg>")
+            btndiv.setAttribute("class", `circle circleidx_${i++}`)
+            btndiv.setAttribute("id", "0")
+            btndiv.addEventListener("click", popoveropen2)
+            btndiv.style.left = e.offsetX + 'px'
+            btndiv.style.top = e.offsetY + 'px';
+            img.parentNode.append(btndiv)
+            popoveropen(btndiv)
+        }
+    }
 
     return (
         <div className={"form_container"}>
@@ -184,10 +293,13 @@ function FeedInsertForm(props) {
                 {/* 셀렉트 */}
                 <div className={'form_box'}>
                     <div className="form_row">
-                        <div className="form_row_title">주거형태<span style={{color: 'rgb(255, 119, 119)'}}>*</span></div>
+                        <div className="form_row_title">주거형태<span
+                            style={{color: 'rgb(255, 119, 119)'}}>*</span>
+                        </div>
                         <div style={{width: '130px', marginRight: '80px'}}>
                             <select className={`form-select ${errors.fd_lvtp}`} required
-                                    name={"fd_lvtp"} value={dto.fd_lvtp} onChange={onChangeData} onClick={onClickData}>
+                                    name={"fd_lvtp"} value={dto.fd_lvtp} onChange={onChangeData}
+                                    onClick={onClickData}>
                                 <option value="" selected disabled></option>
                                 <option value="본인 방">본인 방</option>
                                 <option value="원룸">원룸</option>
@@ -204,11 +316,14 @@ function FeedInsertForm(props) {
                                 <div className="form_empty_msg">필수 입력 항목입니다.</div>
                             }
                         </div>
-                        <div className="form_row_title">가족형태<span style={{color: 'rgb(255, 119, 119)'}}>*</span></div>
+                        <div className="form_row_title">가족형태<span
+                            style={{color: 'rgb(255, 119, 119)'}}>*</span>
+                        </div>
                         <div style={{width: '220px'}}>
                             {/* 필수 입력항목 입력 안했을 시 에러 */}
                             <select className={`form-select ${errors.fd_fml}`} required
-                                    name={"fd_fml"} value={dto.fd_fml} onChange={onChangeData} onClick={onClickData}>
+                                    name={"fd_fml"} value={dto.fd_fml} onChange={onChangeData}
+                                    onClick={onClickData}>
                                 <option value="" selected disabled></option>
                                 <option value="싱글라이프">싱글라이프</option>
                                 <option value="신혼/부부가 사는집">신혼/부부가 사는집</option>
@@ -217,26 +332,33 @@ function FeedInsertForm(props) {
                                 <option value="룸메이트와 함께 사는 집">룸메이트와 함께 사는 집</option>
                                 <option value="기타">기타</option>
                             </select>
-                            {touched.fd_fml && errors.fd_fml&&
+                            {touched.fd_fml && errors.fd_fml &&
                                 <div className="form_empty_msg">필수 입력 항목입니다.</div>
                             }
                         </div>
-                    </div> {/* form_row */}
+                    </div>
+                    {/* form_row */}
                     <div className="form_row">
-                        <div className="form_row_title">평수<span style={{color: 'rgb(255, 119, 119)'}}>*</span></div>
-                        <div style={{width: '130px' ,marginRight: '80px', display: 'block'}}>
-                            <input type={'text'}  className={`form-control ${errors.fd_spc}`} required
-                                   name={"fd_spc"} value={dto.fd_spc} onChange={onChangeData} onClick={onClickData}/>
-                            {!touched.fd_spc?'':errors.fd_spc=="empty error"?
+                        <div className="form_row_title">평수<span
+                            style={{color: 'rgb(255, 119, 119)'}}>*</span></div>
+                        <div style={{width: '130px', marginRight: '80px', display: 'block'}}>
+                            <input type={'text'} className={`form-control ${errors.fd_spc}`} required
+                                   name={"fd_spc"} value={dto.fd_spc} onChange={onChangeData}
+                                   onClick={onClickData}/>
+                            {!touched.fd_spc ? '' : errors.fd_spc == "empty error" ?
                                 <div className="form_empty_msg">필수 입력 항목입니다.</div>
-                                :!regex.test(dto.fd_spc)?<div className="form_empty_msg">숫자만 입력 가능합니다.</div>
-                                :''
+                                : !regex.test(dto.fd_spc) ?
+                                    <div className="form_empty_msg">숫자만 입력 가능합니다.</div>
+                                    : ''
                             }
                         </div>
-                        <div className="form_row_title">스타일<span style={{color: 'rgb(255, 119, 119)'}}>*</span></div>
+                        <div className="form_row_title">스타일<span
+                            style={{color: 'rgb(255, 119, 119)'}}>*</span>
+                        </div>
                         <div style={{width: '220px'}}>
                             <select className={`form-select ${errors.fd_style}`} required
-                                    name={"fd_style"} value={dto.fd_style} onChange={onChangeData} onClick={onClickData}>
+                                    name={"fd_style"} value={dto.fd_style} onChange={onChangeData}
+                                    onClick={onClickData}>
                                 <option value="" selected disabled></option>
                                 <option value="모던">모던</option>
                                 <option value="미니멀&심플">미니멀&심플</option>
@@ -281,55 +403,46 @@ function FeedInsertForm(props) {
                 }
             </div>
 
-            <Editor
-                previewStyle="vertical" // 미리보기 스타일 지정
-                height="500px" // 에디터 창 높이
-                initialEditType="wysiwyg" // 초기 입력모드 설정(디폴트 markdown)
-                plugins={[colorSyntax]}
-                hideModeSwitch={true}
-                toolbarItems={[
-                    // 툴바 옵션 설정
-                    ['heading', 'bold', 'italic', 'strike'],
-                    ['hr', 'quote'],
-                    ['ul', 'ol', 'task', 'indent', 'outdent'],
-                    ['table', 'image', 'link'],
-                ]}
-               /* hooks={{
-                    addImageBlobHook: async (blob, callback) => {
-
-                        const formData = new FormData()
-                        formData.append('file', blob)
-
-                        let url = localStorage.url + "/image/insert"
-
-                        axios.post(url, formData, {
-                            header: {"content-type": "multipart/formdata"}
-                        })
-                            .then(res=>{
-                                callback(res.data)
-                            })
-                    }
-                }}*/
-                onChange={onChange}
-                ref={editorRef}
-            />
-            {/*<div dangerouslySetInnerHTML={ {__html: data} } id={"editorContent"}/>*/}
             {
-                window.document.getElementsByTagName('img').item(0) &&
-                window.document.getElementsByTagName('img').item(0)
-                    .addEventListener("click",(e)=> {
+                submit ? <Viewer initialValue={dto.fd_txt}/>
+                    :
+                    <Editor
+                        previewStyle="vertical" // 미리보기 스타일 지정
+                        height="1000px" // 에디터 창 높이
+                        initialEditType="wysiwyg" // 초기 입력모드 설정(디폴트 markdown)
+                        plugins={[colorSyntax]}
+                        hideModeSwitch={true}
+                        toolbarItems={[
+                            // 툴바 옵션 설정
+                            ['heading', 'bold', 'italic', 'strike'],
+                            ['hr', 'quote'],
+                            ['ul', 'ol', 'task', 'indent', 'outdent'],
+                            ['table', 'image', 'link'],
+                        ]}
+                        hooks={{
+                            addImageBlobHook: async (blob, callback) => {
 
-                        var img =  window.document.getElementsByTagName('img').item(0)
+                                const formData = new FormData()
+                                formData.append('file', blob)
 
-                        createElement("map")
-                        console.log(
-                            "X 좌표 : " + e.offsetX + ", width : " + img.clientWidth + "percentage" + e.offsetX/img.clientWidth*100 +"%",
-                            "Y 좌표 : " + e.offsetY + ", height : " + img.clientHeight + "percentage" + e.offsetY/img.clientHeight*100 +"%"
-                        )
-                    })
+                                let url = localStorage.url + "/image/insert"
+
+                                axios.post(url, formData, {
+                                    header: {"content-type": "multipart/formdata"}
+                                }).then(res => {
+                                    callback(res.data)
+                                })
+                            }
+                        }}
+                        onChange={onChange}
+                        ref={editorRef}
+                    />
             }
-
+            <button type={"button"} className={"btn btn-info"} onClick={addtag}>태그 추가</button>
+            <FeedTagPopover anchorEl={anchorEl} popoverclose={popoverclose} sp_num={sp_num} tagpdnum={tagpdnum}
+                            detail={detail}/>
         </div>
+
     );
 }
 

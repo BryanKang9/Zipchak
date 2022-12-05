@@ -1,14 +1,5 @@
 /*메시지리스트창 */
-div.sellect_user{
-    width: 100%;
-    height: 100%;
-    padding-top: 50px;
-    padding-left: 30px;
-    font-size: 30px;
-    color: #38B9E0;
-    overflow: hidden;
-    font-weight: bold;
-}
+
 div#chat_message{
     height: 80vh;
     padding-bottom: 10px;
@@ -37,7 +28,7 @@ div.msg_list{
     width: 10px;
 }
 .msg_list::-webkit-scrollbar-thumb {
-    background-color: #38B9E0;
+    background-color: #35C5F0;
     border-radius: 10px;
     border: 1px solid white;
 }
@@ -84,7 +75,7 @@ div.msg_list{
 .loader4:before{
     content: "";
     position: absolute;
-    background-color: #38B9E0;
+    background-color: #35C5F0;
     top: 0px;
     left: 0px;
     height: 20px;
@@ -93,13 +84,13 @@ div.msg_list{
     opacity: 1;
     -webkit-transform-origin:  100% 0%;
     transform-origin:  100% 0% ;
-    -webkit-animation: loader4 3s ease-in-out infinite;
-    animation: loader4 3s ease-in-out infinite;
+    -webkit-animation: loader4 1s ease-in-out infinite;
+    animation: loader4 1s ease-in-out infinite;
 }
 
 .loader4:after{
     content: "LOADING ...";
-    color: #38B9E0;
+    color: #35C5F0;
     font-weight: 200;
     font-size: 16px;
     position: absolute;
@@ -139,7 +130,7 @@ div.i_read{
     bottom: 5px;
     width: 50px;
     text-align: right;
-    color: #38B9E0;
+    color: #35C5F0;
 }
 div.i_msg_box{
     margin-right: 10px;
@@ -148,7 +139,7 @@ div.i_msg_box{
     margin-bottom: 5px;
     width: 30%;
     min-width: 200px;
-    background-color: #38B9E0;
+    background-color: #35C5F0;
     padding: 5px 15px;
     color: white;
 }
@@ -159,7 +150,7 @@ div.i_msg_box{
     left:30%;
     margin-top: -10px;
     border: 10px solid transparent;
-    border-left: 15px solid #38B9E0;
+    border-left: 15px solid #35C5F0;
 }
 div.u_msg_box_w_prf{
     position: relative;
@@ -171,7 +162,7 @@ div.chat_prf_box{
     width: 45px;
     height: 45px;
     border-radius: 100px;
-    border: 1px solid #38B9E0;
+    border: 1px solid #35C5F0;
     background: 50% 50% no-repeat;
     background-size: cover;
 }
@@ -191,7 +182,7 @@ div.u_msg_box{
     content: "";
     position: absolute;
     bottom: 20px;
-    left: -25px;
+    left: -24px;
     margin-top: -10px;
     border: 10px solid transparent;
     border-right: 15px solid lightgray;

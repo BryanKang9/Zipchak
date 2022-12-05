@@ -4,8 +4,20 @@
     position: absolute;
     text-align: center;
     z-index: 100;
-    top: 40%;
+    top: 45%;
     left: 45%;
+}
+span.detailavt{
+    display: flex;
+    margin-left: 3%;
+    /*width: 22%;*/
+    gap: 10px;
+    align-items: center;
+    justify-content: left;
+}
+.detailbutton {
+    display: flex;
+    float: right;
 }
 
 /* Arrows */
@@ -107,3 +119,4 @@
 {
     content: '←';
 }
+

@@ -32,19 +32,20 @@ public class ChatRoomController {
         Map<String,Integer> map=crmapper.getRoomChk(crdto);
         int chk=Integer.parseInt(String.valueOf(map.get("count")));
         if(chk==1){
+            crmapper.crstatusTrue(map.get("cr_num"));
             Map<String,Object> sendmap=new HashMap<>();
             sendmap.put("cr_num",map.get("cr_num"));
             sendmap.put("msg","이미 채팅방이 있습니다");
             return sendmap;
         } else {
             crmapper.insertRoom(crdto);
-            //상품이름으로 변경하기
             int sp_num=crdto.getSp_num();
+            String sp_title=crmapper.getSptitle(sp_num);
             int ur_num=crmapper.getSeller(sp_num);
             ChatMessageDto cmdto=new ChatMessageDto();
             cmdto.setCr_num(crdto.getCr_num());
             cmdto.setSender(ur_num);
-            cmdto.setMsg("안녕하세요 "+sp_num+" 상품에 대한 채팅방입니다.");
+            cmdto.setMsg("안녕하세요 "+sp_title+" 상품에 대한 채팅방입니다.");
             cmmapper.insertChatMessage(cmdto);
             Map<String,Object> sendmap2=new HashMap<>();
             sendmap2.put("cr_num",crdto.getCr_num());
@@ -55,5 +56,18 @@ public class ChatRoomController {
     @GetMapping("/getbuyer")
     public List<Map<String,Object>> getBuyer(int sp_num){
         return crmapper.getBuyer(sp_num);
+    }
+    @GetMapping("/getunum")
+    public int getUnum(int cr_num,int ur_num)
+    {
+        Map<String,Integer> map=crmapper.getUnum(cr_num);
+        //System.out.println(map.get("ur_num"));
+       //System.out.println(map.get("buyer_num"));
+        if (ur_num==map.get("ur_num")) {return map.get("buyer_num");}
+        else{return map.get("ur_num"); }
+    }
+    @GetMapping("/crstatusfalse")
+    public void crstatusFalse(int cr_num ){
+        crmapper.crstatusFalse(cr_num);
     }
 }

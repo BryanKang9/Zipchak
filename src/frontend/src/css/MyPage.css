@@ -1,0 +1,376 @@
+div.mypage_otr_container{
+    width:95%;
+    max-width:1136px;
+    margin:auto;
+    min-height: 620px;
+}
+div.mypage_container{
+    display: grid;
+    height: 100%;
+    margin-bottom: 50px;
+}
+/*프로필*/
+div.mypage_prf_box{
+    border: 1px solid lightgray;
+    border-radius: 15px;
+    box-shadow: rgba(99, 99, 99, 0.2) 0 2px 8px 0;
+    height: 350px;
+}
+div.mypage_prf_img_box{
+    width: 100px;
+    height: 100px;
+    overflow: hidden;
+    border-radius: 100px;
+    border: 1px solid #35c5f0;
+    /*box-shadow: rgba(53, 197, 240, 0.5) 0 0 0 3px;*/
+}
+img.mypage_prf_img{
+    width: 100px;
+    height: 100px;
+}
+div.mypage_prf_nick_tmp{
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    position: relative;
+    left: 20px;
+}
+div.mypage_update_img_box{
+    width: 100px;
+    height: 100px;
+    overflow: hidden;
+    border-radius: 100px;
+    border: 1px solid #35c5f0;
+    position: relative;
+    left: 50%;
+    transform: translate(-50%);
+    text-align: center;
+    /*box-shadow: rgba(53, 197, 240, 0.5) 0 0 0 3px;*/
+}
+img.mypage_update_img{
+    width: 100px;
+    height: 100px;
+}
+div.mypage_update_img_btn{
+    position:relative;
+    top:-40px;
+    left:57%;
+    width:40px;
+    height:40px;
+    padding-top: 7px;
+    background-color:lightgray;
+    border-radius:100px;
+    cursor: pointer;
+}
+div.mypage_prf_nick{
+    font-size: 20px;
+    text-align: center;
+    margin-top: 10px;
+}
+div.updateinfo_title{
+    width: 80px;
+    padding-left: 10px;
+}
+.updateinfo_input{
+    width: 270px;
+}
+.mypage-row{
+    margin-bottom: 10px;
+}
+.my-swal{
+    z-index: 200000;
+}
+.stamp_box{
+    display: flex;
+    margin: 0 auto 5px;
+    justify-content: center;
+}
+:is(.stamp1,.stamp2,.stamp3,.stamp4,.stamp5){
+    border: 5px double #35c5f0;
+    color: #35c5f0;
+    width: 50px;
+    height: 50px;
+    border-radius: 100px;
+    transform: rotate(-40deg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 5px 0 0;
+    font-size: 10px;
+    animation-name:stampani ;
+    animation-duration: 2s;
+    animation-iteration-count: 1;
+    animation-timing-function: ease;
+    animation-fill-mode: forwards;
+}
+.stamp1{
+    animation-delay:0s ;
+}
+.stamp2{
+    animation-delay:0.3s ;
+}
+.stamp3{
+    animation-delay:0.6s ;
+}
+.stamp4{
+    animation-delay:0.9s ;
+}
+.stamp5{
+    animation-delay:1.2s ;
+}
+@keyframes stampani {
+    0% {transform: scale(1); opacity: 0;}
+    80% {transform: rotate(-20deg) scale(5);opacity: 0;}
+    100% {transform: rotate(-40deg) scale(1);opacity: 1;}
+}
+.stamp_txt{
+    color: #35c5f0;
+    width: 100%;
+    text-align: center;
+    border-top:1px solid #35c5f0;
+    border-bottom:1px solid #35c5f0;
+}
+/*리스트*/
+.mypage_prf_subject{
+    text-align: center;
+    font-size: 25px;
+    font-weight: bold;
+}
+.mypage_menu{
+    display: flex;
+    width: 100%;
+    min-width: 600px;
+    font-size: 20px;
+    gap: 10px;
+    text-align: center;
+    justify-content: center;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.mypage_menu_each:hover{
+    text-decoration: underline wavy #35c5f0 3px;
+}
+.list_show{
+    display: block;
+}
+.list_hide{
+    display: none;
+}
+.mypage_title{
+    font-size: 20px;
+    font-weight: bold;
+    margin-left:10px ;
+    cursor: pointer;
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+/*리스트 이미지카드형*/
+.mypage_ul_card{
+    margin-left: 10px;
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+}
+.mypage_li_card{
+    margin-bottom: 10px;
+    /*border: 1px solid #35C5F0;*/
+    border-radius: 10px;
+    padding: 3px;
+    width: 30%;
+    height: 30%;
+    overflow: hidden;
+    margin-right: 1%;
+}
+.mypage_li_card:hover{
+    transform: scale(1.05);
+}
+.card_show{
+    display: block;
+}
+.card_hide{
+    display: none;
+}
+
+img.mypage_sp_img_card{
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+    border-radius: 10px;
+    margin-right: 10px;
+    cursor: pointer;
+    margin-bottom: 5px;
+}
+.mypage_fd_title_card{
+    margin-left: 10px;
+    text-align: center;
+    width: calc(90% - 10px);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    word-break: keep-all;
+}
+.mypage_sp_title_card{
+    margin-left: 10px;
+    text-align: center;
+    width: calc(90% - 10px);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+}
+.mypage_pd_status_card{
+    width: 100%;
+    height: 30px;
+    color: #35C5F0;
+    border: 1px solid white;
+    border-radius: 10px;
+    background-color: white;
+    text-align: center;
+}
+/*리스트 목록형*/
+.mypage_ul{
+    margin-left: 10px;
+    width: 100%;
+}
+.mypage_li{
+    list-style: none;
+    margin-bottom: 10px;
+    border-radius: 10px;
+    padding: 3px;
+    width: 90%;
+    position: relative;
+    cursor: pointer;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+    transition: all 0.3s cubic-bezier(.25,.8,.25,1);
+}
+.mypage_li:hover {
+    box-shadow: 0 10px 10px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
+}
+img.mypage_sp_img{
+    width: 50px;
+    height: 50px;
+    border: 1px solid #35C5F0;
+    border-radius: 10px;
+    margin-right: 10px;
+
+}
+div.mypage_sp_title{
+    height: 50px;
+    line-height: 50px;
+}
+div.mypage_sp_title_for_rv{
+    height: 50px;
+}
+.mypage_pd_status{
+    width: 100px;
+    color: #35C5F0;
+    border: 1px solid white;
+    border-radius: 10px;
+    background-color: white;
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 15px;
+    text-align: right;
+}
+.mypage_btn_shape{
+    color: #35C5F0;
+    border: 1px solid white;
+    border-radius: 10px;
+    background-color: white;
+    padding: 15px;
+}
+.mypage_btn_prf{
+    width: auto;
+    margin:5px auto;
+    display:block;
+}
+.mypage_btn_rev{
+    width: 150px;
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+.mypage_btn_shape:hover {
+    background-color: #35C5F0;
+    color: white;
+}
+/*반응형*/
+/*폭클경우*/
+@media screen and (min-width: 768px) {
+    div.mypage_container{
+        grid-template-columns: 25% 75%;
+    }
+    div.mypage_prf_box{
+        position: fixed;
+        top:250px;
+        width: 25%;
+        max-width: 290px;
+        padding-top:30px;
+    }
+    .mypage_ul_card{
+        width: 100%;
+        display: flex;
+        flex-wrap: wrap;
+    }
+    .mypage_li_card {
+        width: 30%;
+        height: 30%;
+    }
+    .mypage_prf_img_box {
+        position: relative;
+        left: 50%;
+        transform: translate(-50%);
+        text-align: center;
+    }
+    .mypage_prf_nick_tmp {
+        margin-top: 20px;
+        margin-bottom: 20px;
+        width: 100%;
+    }
+}
+
+/*폭작을경우*/
+@media screen and (max-width: 768px) {
+    div.mypage_container{
+        grid-template-rows: auto 1fr;
+    }
+    div.mypage_prf_box{
+        margin-left: 5%;
+        width: 90%;
+        height: 100%;
+        padding: 30px;
+        align-items: center;
+    }
+    .mypage_ul_card{
+        width: 100%;
+    }
+    .mypage_li_card {
+        width: 45%;
+        height: 45%;
+        margin-bottom: 10px;
+    }
+    .mypage_prf_img_nick_tmp{
+        min-width: 550px;
+        height: 100%;
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        gap:10px;
+    }
+    .mypage_prf_nick_tmp {
+        width: auto;
+        margin-bottom: 20px;
+    }
+    .mypage_btn_shape{
+        word-break: keep-all;
+    }
+    .mypage_prf_with_stamp{
+        margin-left: 35px;
+    }
+}
